@@ -3,7 +3,7 @@ import click
 from typing import Optional
 
 from .alerts import send
-from .logging import setup as get_logger
+from .logger import setup as setup_logger
 from .population import PopulationService
 
 
@@ -40,7 +40,7 @@ def download_population(ctx: click.Context, url: str):
     """
     db_population = ctx.obj['db_population']
     debug = ctx.obj['debug']
-    logger = get_logger(debug)
+    logger = setup_logger(debug)
     svc = PopulationService(logger=logger)
     svc.connect(db_population)
     svc.download(url)
@@ -63,7 +63,7 @@ def download_population(ctx: click.Context, url: str):
 def send_alerts(ctx: click.Context, config: str, dry_run: bool = False):
     db_population = ctx.obj['db_population']
     debug = ctx.obj['debug']
-    logger = get_logger(debug)
+    logger = setup_logger(debug)
     send(db_population, config, logger=logger)
 
 
