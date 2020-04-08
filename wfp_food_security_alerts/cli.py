@@ -1,5 +1,10 @@
 import click
 
+from typing import Optional
+
+from .logging import setup as get_logger
+from .population import download
+
 
 @click.group()
 @click.option(
@@ -10,15 +15,32 @@ import click
 @click.option(
     "--debug/--no-debug", help="enable debug mode: verbose logging", default=False,
 )
+@click.pass_context
 def cli(
-    db_population: str = None, debug: bool = False, **kw,
+    ctx: Optional[click.Context] = None,
+    db_population: str = None,
+    debug: bool = False,
+    **kw,
 ):
-    pass
+    if ctx is not None:
+        ctx.ensure_object(dict)
+        ctx.obj['db_population'] = db_population
+        ctx.obj['debug'] = debug
 
 
 @cli.command()
-def download_population():
-    pass
+@click.argument('url', required=True)
+@click.pass_context
+def download_population(ctx: click.Context, url: str):
+    """Download the population data and stores it in a local database
+
+    URL is the URL of the CSV containing the population data (region_id, population).
+    The CSV is expected to be comma separated, UTF-8 encoded, and included the header.
+    """
+    db_population = ctx.obj['db_population']
+    debug = ctx.obj['debug']
+    logger = get_logger(debug)
+    download(db_population, url, logger=logger)
 
 
 @cli.command()

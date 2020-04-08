@@ -125,3 +125,5 @@ tmp/
 # persisted data
 data/mongodb
 data/rabbitmq
+
+*.sqlite3

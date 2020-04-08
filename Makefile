@@ -41,3 +41,15 @@ check: black-check flake8 mypy pylint pycodestyle
 .PHONY:
 venv:
 	python3 -m venv venv
+
+.PHONY: test
+test:
+	py.test -p no:warnings
+
+.PHONY: coverage
+coverage:
+	coverage run -m py.test -p no:warnings
+	coverage report
+	coverage html
+	coverage xml
+
