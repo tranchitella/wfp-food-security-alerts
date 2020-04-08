@@ -2,6 +2,7 @@ import click
 
 from typing import Optional
 
+from .alerts import send
 from .logging import setup as get_logger
 from .population import download
 
@@ -45,12 +46,23 @@ def download_population(ctx: click.Context, url: str):
 
 @cli.command()
 @click.option(
+    "-c",
+    "--config",
+    type=click.STRING,
+    help="configuration file (yaml format), see README.md for the format",
+    required=True,
+)
+@click.option(
     "--dry-run/--no-dry-run",
     help="enable dry-run mode: no notification is sent, only output is produced",
     default=False,
 )
-def send_alerts(dry_run: bool = False,):
-    pass
+@click.pass_context
+def send_alerts(ctx: click.Context, config: str, dry_run: bool = False):
+    db_population = ctx.obj['db_population']
+    debug = ctx.obj['debug']
+    logger = get_logger(debug)
+    send(db_population, config, logger=logger)
 
 
 def cli_with_env():  # pragma: no cover

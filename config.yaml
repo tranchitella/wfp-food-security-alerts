@@ -1,0 +1,36 @@
+# list of countries the tool is enabled for
+# - country_id (integer) is the ID of the country
+# - emails (list of strings) is the list of addresses to send the notifications to
+countries:
+  - id: 4
+    emails:
+      - fabio+country4@tranchitella.eu
+      - info+country4@tranchitella.eu
+
+global:
+  # food security decreases significantly in a country if the percentage of food
+  # insecure people in a country increases of >= (threshold) compared to
+  # (days_ago) days ago
+
+  # percentage (5.0 means 5%) 
+  threshold: 0.01
+
+  # days ago (integer)
+  days_ago: 30
+
+  # list of email addresses to Cc in all notifications
+  emails:
+    - hostmaster@tranchitella.eu
+
+  # smtp settings (username and password are not mandatory)
+  smtp:
+    sender: no-reply@wfp.org
+    host: mail.tranchitella.eu
+    port: 25
+    username: 
+    password: 
+
+  # API end-points to get external data
+  api:
+    foodsecurity: "https://api.hungermapdata.org/swe-notifications/foodsecurity"
+    country_regions: "https://api.hungermapdata.org/swe-notifications/country/%s/regions"

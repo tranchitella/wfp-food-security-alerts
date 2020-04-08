@@ -16,6 +16,18 @@ $ wfp-food-security-alerts --db-population=population.sqlite3 --debug download-p
 
 The CLI will create a SQLite database named `population.sqlite` containing the data from the CSV.
 
+## Write your configuration file
+
+The tool needs a configuration file which includes global and country-specific settings; please see the `config.yaml` provided with the source package for an example.
+
+## Run the tool
+
+You can run the tool using the following command
+
+```bash
+$ wfp-food-security-alerts --db-population=population.sqlite3 --debug send_alerts --config=config.yaml
+```
+
 ## Run the tests
 
 This software includes a test suite you can run using the following command:

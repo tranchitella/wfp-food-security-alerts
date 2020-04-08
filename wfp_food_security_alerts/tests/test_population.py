@@ -1,5 +1,4 @@
 import os
-import sqlite3
 
 from wfp_food_security_alerts import population
 

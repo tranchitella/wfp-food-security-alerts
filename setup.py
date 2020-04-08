@@ -12,7 +12,12 @@ setuptools.setup(
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://wfp.org",
-    install_requires=['Click>=7.1', 'python-dateutil>=2.8.0', 'requests>=2.23.0'],
+    install_requires=[
+        'Click>=7.1',
+        'python-dateutil>=2.8.0',
+        'requests>=2.23.0',
+        'pyyaml>=5.3.0',
+    ],
     packages=setuptools.find_packages(),
     classifiers=[
         "Programming Language :: Python :: 3",
