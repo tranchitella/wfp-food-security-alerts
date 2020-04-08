@@ -27,7 +27,9 @@ def test_write_rows_to_sqlite_and_get_population_by_region(tmpdir):
 
 def test_get_rows_from_url():
     db = PopulationService()
-    iterator = db.get_rows_from_url("https://api.hungermapdata.org/swe-notifications/population.csv")
+    iterator = db.get_rows_from_url(
+        "https://api.hungermapdata.org/swe-notifications/population.csv"
+    )
     item = next(iterator)
     assert item is not None
     assert item['region_id'] is not None

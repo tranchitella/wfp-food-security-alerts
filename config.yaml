@@ -25,7 +25,7 @@ global:
   # smtp settings (username and password are not mandatory)
   smtp:
     sender: no-reply@wfp.org
-    host: mail.tranchitella.eu
+    host: localhost
     port: 25
     username: 
     password: 

@@ -6,40 +6,27 @@ import sqlite3
 from contextlib import closing
 from typing import Iterator, Optional
 
+from .logger import LoggerMixin
 
-class PopulationService(object):
+
+class PopulationService(LoggerMixin):
 
     _db: sqlite3.Connection
-    _logger: logging.Logger
-    
-    def __init__(self, logger: Optional[logging.Logger] = None):
+
+    def __init__(self):
+        super(PopulationService, self).__init__()
         self._db = None
-        self._logger = logger
 
     def connect(self, db_population: str) -> sqlite3.Connection:
         db = sqlite3.connect(db_population)
         self._db = db
         return db
 
-    def close(self) -> sqlite3.Connection:
+    def close(self):
         self._db.close()
         self._db = None
 
-    def log_debug(self, *args, **kw):
-        if self._logger is not None:
-            self._logger.debug(*args, **kw)
-            
-    def log_warning(self, *args, **kw):
-        if self._logger is not None:
-            self._logger.warning(*args, **kw)
-            
-    def log_error(self, *args, **kw):
-        if self._logger is not None:
-            self._logger.error(*args, **kw)
-            
-    def download(
-        self, url: str, 
-    ) -> int:
+    def download(self, url: str,) -> int:
         iterator = self.get_rows_from_url(url)
         return self.write_rows_to_sqlite(iterator)
 
@@ -76,9 +63,7 @@ class PopulationService(object):
             self.log_error('Unable to download the data: %s', e)
 
     def write_rows_to_sqlite(
-        self,
-        iterator: Iterator[dict],
-        logger: Optional[logging.Logger] = None,
+        self, iterator: Iterator[dict], logger: Optional[logging.Logger] = None,
     ) -> int:
         self._db.execute("DROP TABLE IF EXISTS population;")
         self._db.execute(
@@ -94,10 +79,7 @@ class PopulationService(object):
         self._db.commit()
         return n + 1
 
-
-    def get_population_by_region_id(
-        self, region_id: int
-    ) -> Optional[int]:
+    def get_population_by_region_id(self, region_id: int) -> Optional[int]:
         c = self._db.execute(
             "SELECT population FROM population WHERE region_id = ?;", [region_id]
         )

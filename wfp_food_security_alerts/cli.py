@@ -2,7 +2,9 @@ import click
 
 from typing import Optional
 
-from .alerts import send
+from .alerts import AlertService
+from .api import APIService
+from .config import read_config_file
 from .logger import setup as setup_logger
 from .population import PopulationService
 
@@ -41,7 +43,8 @@ def download_population(ctx: click.Context, url: str):
     db_population = ctx.obj['db_population']
     debug = ctx.obj['debug']
     logger = setup_logger(debug)
-    svc = PopulationService(logger=logger)
+    svc = PopulationService()
+    svc.set_logger(logger=logger)
     svc.connect(db_population)
     svc.download(url)
 
@@ -61,10 +64,26 @@ def download_population(ctx: click.Context, url: str):
 )
 @click.pass_context
 def send_alerts(ctx: click.Context, config: str, dry_run: bool = False):
-    db_population = ctx.obj['db_population']
     debug = ctx.obj['debug']
     logger = setup_logger(debug)
-    send(db_population, config, logger=logger)
+    #
+    db_population = ctx.obj['db_population']
+    population = PopulationService()
+    population.set_logger(logger=logger)
+    population.connect(db_population)
+    #
+    #
+    config_data = read_config_file(config)
+    if config_data is None:
+        raise click.Abort()
+    #
+    api = APIService(config_data)
+    svc = AlertService(config_data, api=api, population=population)
+    svc.set_logger(logger=logger)
+    try:
+        svc.run(dry_run)
+    finally:
+        population.close()
 
 
 def cli_with_env():  # pragma: no cover
