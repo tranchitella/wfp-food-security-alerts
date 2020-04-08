@@ -1,7 +1,6 @@
 import yaml
 import logging
 import requests
-import sqlite3
 import smtplib
 
 from email.mime.multipart import MIMEMultipart
@@ -10,7 +9,7 @@ from json import loads
 from operator import itemgetter
 from typing import Dict, Optional, Tuple
 
-from .population import get_sqlite3_connection, get_population_by_region_id
+from .population import PopulationService
 
 
 GET_FOODSECURITY = 'https://api.hungermapdata.org/swe-notifications/foodsecurity'
@@ -41,7 +40,7 @@ def send(db_population: str, config: str, logger: Optional[logging.Logger] = Non
     config_data = read_config_file(config, logger=logger)
     if config_data is None:
         return
-    db = get_sqlite3_connection(db_population)
+    db = PopulationService(db_population)
     try:
         evaluate_alerts(config_data, db, logger=logger)
     finally:
@@ -65,7 +64,7 @@ def read_config_file(
 
 
 def evaluate_alerts(
-    config: dict, db: sqlite3.Connection, logger: Optional[logging.Logger]
+    config: dict, db: PopulationService, logger: Optional[logging.Logger]
 ):
     days_ago = config['global']['days_ago']
     threshold = config['global']['threshold']
@@ -96,7 +95,7 @@ def evaluate_alerts(
             if food_security_days_ago_region is None:
                 data_not_found = True
                 break
-            population_region = get_population_by_region_id(db, region_id)
+            population_region = db.get_population_by_region_id(region_id)
             if population_region is None:
                 data_not_found = True
                 break

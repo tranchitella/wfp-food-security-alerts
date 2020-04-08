@@ -4,7 +4,7 @@ from typing import Optional
 
 from .alerts import send
 from .logging import setup as get_logger
-from .population import download
+from .population import PopulationService
 
 
 @click.group()
@@ -41,7 +41,9 @@ def download_population(ctx: click.Context, url: str):
     db_population = ctx.obj['db_population']
     debug = ctx.obj['debug']
     logger = get_logger(debug)
-    download(db_population, url, logger=logger)
+    svc = PopulationService(logger=logger)
+    svc.connect(db_population)
+    svc.download(url)
 
 
 @cli.command()
