@@ -33,7 +33,7 @@ class PopulationService(LoggerMixin):
     def get_rows_from_url(
         self, url: str, logger: Optional[logging.Logger] = None
     ) -> Iterator[dict]:
-        self.log_debug("Downloading population data from %s", url)
+        self.log_debug("downloading population data from %s", url)
         try:
             with closing(requests.get(url, stream=True)) as r:
                 r.raise_for_status()
@@ -46,21 +46,21 @@ class PopulationService(LoggerMixin):
                         continue
                     elif len(row) != len(header):
                         self.log_warning(
-                            "Skip line %d, wrong number of columns: %s", n + 1, row
+                            "skipping line %d, wrong number of columns: %s", n + 1, row
                         )
                         continue
                     try:
                         values = map(int, row)
                     except (ValueError, TypeError):
                         self.log_warning(
-                            "Ignore line %d, unable to convert values to int: %s",
+                            "ignoring line %d, unable to convert values to int: %s",
                             n + 1,
                             row,
                         )
                     data = dict(zip(header, values))
                     yield data
         except requests.exceptions.HTTPError as e:
-            self.log_error('Unable to download the data: %s', e)
+            self.log_error('unable to download the data: %s', e)
 
     def write_rows_to_sqlite(
         self, iterator: Iterator[dict], logger: Optional[logging.Logger] = None,
@@ -75,7 +75,7 @@ class PopulationService(LoggerMixin):
                 "INSERT INTO population (region_id, population) VALUES (?, ?);",
                 [row['region_id'], row['population']],
             )
-        self.log_debug("Inserted %d records into the population database", n + 1)
+        self.log_debug("inserted %d records into the population database", n + 1)
         self._db.commit()
         return n + 1
 

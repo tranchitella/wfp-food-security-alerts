@@ -26,7 +26,7 @@ class APIService(LoggerMixin):
             requests.exceptions.HTTPError,
             requests.exceptions.ConnectionError,
         ) as e:
-            self.log_error('Unable to download the data: %s', e)
+            self.log_error('unable to download the data from API %s', e)
             return {}
         data = loads(r.content)
         return dict((x['region_id'], x['food_insecure_people']) for x in data)
@@ -38,7 +38,7 @@ class APIService(LoggerMixin):
             r = requests.get(url)
             r.raise_for_status()
         except requests.exceptions.HTTPError as e:
-            self.log_error('Unable to download the data: %s', e)
+            self.log_error('unable to download the data from API: %s', e)
             return tuple()
         data = loads(r.content)
         regions = data.get('regions') or {}

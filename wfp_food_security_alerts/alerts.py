@@ -53,7 +53,7 @@ WFP
         notifications = []
         countries = self._config.get('countries') or []
         for country in countries:
-            self.log_debug("Evaluating alerts for country id = %s", country['id'])
+            self.log_debug("evaluating alerts for country id = %s", country['id'])
             data_not_found = False
             food_security_country = 0
             food_security_days_ago_country = 0
@@ -117,7 +117,7 @@ WFP
                     - p_food_security_days_ago,
                 }
                 notifications.append(notification)
-                self.log_info("New notification: %r", notification)
+                self.log_info("new notification: %r", notification)
         # send the nodifications via SMTP
         if len(notifications) > 0 and not dry_run:
             self.send_notifications(notifications)
@@ -128,13 +128,21 @@ WFP
         # connection to the SMTP server
         smtp_host = self._config['global']['smtp']['host']
         smtp_port = self._config['global']['smtp']['port']
-        s = smtplib.SMTP(host=smtp_host, port=smtp_port)
+        try:
+            s = smtplib.SMTP(host=smtp_host, port=smtp_port)
+        except smtplib.SMTPConnectError as e:
+            self.log_error("unable to connect to the SMTP server: %s", e)
+            return
         # (optional) log in to the SMTP server
         smtp_username = self._config['global']['smtp'].get('username')
         smtp_password = self._config['global']['smtp'].get('password')
         if smtp_username and smtp_password:
-            s.login(smtp_username, smtp_password)
-        # se
+            try:
+                s.login(smtp_username, smtp_password)
+            except smtplib.SMTPAuthenticationError as e:
+                self.log_error("unable to log into the SMTP server: %s", e)
+                return
+        # send the notifications
         for notification in notifications:
             msg = MIMEMultipart()
             msg['From'] = self._config['global']['smtp']['sender']
@@ -146,7 +154,10 @@ WFP
             )
             message = self.NOTIFICATION_TEMPLATE % notification
             msg.attach(MIMEText(message, 'plain'))
-            s.send_message(msg)
+            try:
+                s.send_message(msg)
+            except smtplib.SMTPResponseException as e:
+                self.log_error("unable to send the email message: %s", e)
         s.close()
 
     def evaluate_alert_condition(
